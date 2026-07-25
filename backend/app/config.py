@@ -2,9 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    
-    database_url: str = "postgresql://postgres:postgres@localhost:5432/ai_dev_platform"
-
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/ai_dev_platform"
     github_client_id: str = ""
     github_client_secret: str = ""
     github_oauth_redirect_uri: str = "http://localhost:8000/auth/github/callback"
