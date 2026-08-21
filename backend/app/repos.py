@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import User, Repo, RepoFile, IndexStatus
+from app.indexing import index_repo
 
 router = APIRouter(prefix="/repos", tags=["repos"])
 
@@ -110,3 +111,17 @@ def list_repo_files(
 
     files = db.query(RepoFile).filter(RepoFile.repo_id == repo_id).all()
     return [{"path": f.path, "language": f.language} for f in files]
+
+@router.post("/{repo_id}/index")
+def trigger_indexing(
+        repo_id: int,
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+):
+    repo = db.query(Repo).filter(Repo.id == repo_id, Repo.owner_id == user.id).first()
+    if repo is None:
+        raise HTTPException(status_code=404, detail="Repo not found")
+
+    index_repo(repo_id, db)
+    db.refresh(repo)
+    return {"id": repo.id, "index_status": repo.index_status}
