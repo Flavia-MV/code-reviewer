@@ -43,4 +43,15 @@ def chunk_file(content: str, language: str) -> list[dict]:
                 walk(child)
 
     walk(tree.root_node)
+
+    if not chunks:
+        line_count = content.count("\n") + 1
+        chunks.append({
+            "content": content,
+            "chunk_type": "module",
+            "name": None,
+            "start_line": 1,
+            "end_line": line_count,
+        })
+
     return chunks
