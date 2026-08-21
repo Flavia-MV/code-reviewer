@@ -1,5 +1,3 @@
-from multiprocessing import synchronize
-
 from sqlalchemy.orm import Session
 
 from app.chunking import chunk_file
@@ -22,7 +20,7 @@ def index_repo(repo_id: int, db: Session):
                 db.query(RepoFile.id).filter(RepoFile.repo_id == repo_id)
             )
         ).delete(synchronize_session=False)
-        files = db.query(RepoFile).filter(RepoFile.id == repo_id).all()
+        files = db.query(RepoFile).filter(RepoFile.repo_id == repo_id).all()
 
         all_chunks = []
         for file in files:
