@@ -2,6 +2,9 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import Float
+
 import enum
 
 from app.database import Base
@@ -53,3 +56,17 @@ class RepoFile(Base):
     sha = Column(String, nullable=True)
 
     repo = relationship("Repo", back_populates="files")
+    chunks = relationship("CodeChunk", back_populates="file")
+
+class CodeChunk(Base):
+    __tablename__ = "code_chunks"
+    id = Column(Integer, primary_key=True, index=True)
+    file_id = Column(Integer, ForeignKey("repo_files.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    chunk_type = Column(String, nullable=True)
+    name = Column(String, nullable=True)
+    start_line = Column(Integer, nullable=False)
+    end_line = Column(Integer, nullable=False)
+    embedding = Column(ARRAY(Float), nullable=True)
+
+    file = relationship("RepoFile", back_populates="chunks")
