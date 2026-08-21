@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60 * 24 * 7  # 7 zile
 
+    openai_api_key: str = ""
+
     frontend_url: str = "http://localhost:3000"
 
     class Config:
