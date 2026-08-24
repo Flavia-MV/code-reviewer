@@ -47,7 +47,20 @@ export default function Dashboard() {
       setLoading(false);
     }
   }
-
+  async function indexRepo(repoId: number) {
+        setLoading(true);
+        try {
+            await fetch(`${BACKEND_URL}/repos/${repoId}/index`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            await fetchRepos();
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+        } finally {
+            setLoading(false);
+        }
+    }
   return (
     <main style={{ maxWidth: "600px", margin: "3rem auto", fontFamily: "sans-serif" }}>
       <h1>Repo-urile tale</h1>
@@ -68,12 +81,18 @@ export default function Dashboard() {
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         {repos.map((repo) => (
-          <li key={repo.id} style={{ padding: "0.75rem", border: "1px solid #eee", borderRadius: "8px", marginBottom: "0.5rem" }}>
-            <strong>{repo.full_name}</strong>
-            <span style={{ marginLeft: "0.5rem", color: "#666" }}>({repo.index_status})</span>
+          <li key={repo.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", border: "1px solid #eee", borderRadius: "8px", marginBottom: "0.5rem" }}>
+            <span>
+                <strong>{repo.full_name}</strong>
+                <span style={{ marginLeft: "0.5rem", color: "#666" }}>({repo.index_status})</span>
+            </span>
+             <button onClick={() => indexRepo(repo.id)} disabled={loading}>
+                 Indexeaza
+             </button>
           </li>
         ))}
       </ul>
     </main>
   );
 }
+

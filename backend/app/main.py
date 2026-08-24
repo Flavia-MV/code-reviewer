@@ -9,7 +9,7 @@ from app.models import User
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="AI Developer Platform API")
+app = FastAPI(title="Code Reviewer API")
 
 app.add_middleware(
     CORSMiddleware,
