@@ -14,6 +14,10 @@ export default function Dashboard() {
     const [repoInput, setRepoInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [question, setQuestion] = useState("");
+    const [answer, setAnswer] = useState<{ answer: string; sources: any[] } | null>(null);
+    const [askingRepoId, setAskingRepoId] = useState<number | null>(null);
+    const [asking, setAsking] = useState(false);
 
     const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
 
@@ -61,6 +65,27 @@ export default function Dashboard() {
             setLoading(false);
         }
     }
+
+    async function askQuestion(repoId: number) {
+        setAsking(true);
+        setAnswer(null);
+        try {
+            const res = await fetch(
+                `${BACKEND_URL}/repos/${repoId}/ask?question=${encodeURIComponent(question)}`,
+                {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+                );
+            const data = await res.json();
+            setAnswer(data);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+        } finally {
+            setAsking(false);
+        }
+    }
+
   return (
     <main style={{ maxWidth: "600px", margin: "3rem auto", fontFamily: "sans-serif" }}>
       <h1>Repo-urile tale</h1>
@@ -81,14 +106,55 @@ export default function Dashboard() {
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         {repos.map((repo) => (
-          <li key={repo.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", border: "1px solid #eee", borderRadius: "8px", marginBottom: "0.5rem" }}>
-            <span>
-                <strong>{repo.full_name}</strong>
-                <span style={{ marginLeft: "0.5rem", color: "#666" }}>({repo.index_status})</span>
-            </span>
-             <button onClick={() => indexRepo(repo.id)} disabled={loading}>
-                 Indexeaza
-             </button>
+          <li key={repo.id} style={{ padding: "0.75rem", border: "1px solid #eee", borderRadius: "8px", marginBottom: "0.5rem" }}>
+              <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                <span>
+                    <strong>{repo.full_name}</strong>
+                    <span style={{ marginLeft: "0.5rem", color: "#666" }}>({repo.index_status})</span>
+                </span>
+                  <div style={{display: "flex", gap: "0.5rem"}}>
+                     <button onClick={() => indexRepo(repo.id)} disabled={loading}>
+                         Indexeaza
+                     </button>
+                      {repo.index_status === "ready" && (
+                          <button onClick={() => setAskingRepoId(askingRepoId === repo.id ? null : repo.id)}>
+                           Intreaba
+                          </button>
+                      )}
+                  </div>
+              </div>
+
+              {askingRepoId === repo.id && (
+                  <div style = {{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                      <div style={{display: "flex", gap: "0.5rem"}}>
+                          <input
+                              value={question}
+                              onChange={(e) => setQuestion(e.target.value)}
+                              placeholder="Ce vrei sa stii despre acest cod?"
+                              style={{flex:1, padding: "0.5rem"}}
+                              />
+                          <button onClick={() => askQuestion(repo.id)} disabled={asking || !question}>
+                              {asking ? "Se gandeste..." : "Trimite"}
+                          </button>
+                      </div>
+                      {answer && (
+                          <div style ={{marginTop: "1rem", paddingTop: "1rem", background: "#f7f7f7", borderRadius: "8px"}}>
+                              <p>{answer.answer}</p>
+                              <div style = {{marginTop: "0.5rem", fontSize: "0.85rem", color: "#666"}}>
+                                  <strong>Surse:</strong>
+                                  <ul>
+                                      {answer.sources.map((source, i) => (
+                                          <li key={i}>
+                                              {source.file_path} (linii {source.start_line}-{source.end_line})
+                                              {source.name && ` - ${source.name}`}
+                                          </li>
+                                          ))}
+                                  </ul>
+                              </div>
+                          </div>
+                      )}
+                  </div>
+              )}
           </li>
         ))}
       </ul>

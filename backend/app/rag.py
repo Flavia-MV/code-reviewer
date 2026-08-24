@@ -25,7 +25,7 @@ def answer_question(query: str, repo_id: int, db) -> dict:
 
     if not relevant_chunks:
         return {
-            "answer": "No indexed code found in this repository. Try indexing it first.",
+            "answer": "I couldn't find core relevant enough to answer this question confidently.",
             "sources": [],
         }
     context = build_context(relevant_chunks)
