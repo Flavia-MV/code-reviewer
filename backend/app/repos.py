@@ -10,6 +10,7 @@ from app.models import User, Repo, RepoFile, IndexStatus
 from app.indexing import index_repo
 
 from app.rag import answer_question
+from app.pr_review import fetch_pr_diff, review_pr
 
 router = APIRouter(prefix="/repos", tags=["repos"])
 
@@ -135,4 +136,17 @@ def ask_question(repo_id: int, question: str, user: User = Depends(get_current_u
         raise HTTPException(status_code=404, detail="Repo not found")
 
     result = answer_question(question, repo_id, db)
+    return result
+
+@router.post("/{repo_id}/review-pr")
+async def review_pull_request(repo_id:int, pr_number:int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    repo = db.query(Repo).filter(Repo.id == repo_id, Repo.owner_id == user.id).first()
+    if repo is None:
+        raise HTTPException(status_code=404, detail="Repo not found")
+    try:
+        diff = await fetch_pr_diff(repo.full_name, pr_number, user.access_token)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = review_pr(diff, repo_id, db)
     return result
