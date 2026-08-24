@@ -9,6 +9,8 @@ from app.database import get_db
 from app.models import User, Repo, RepoFile, IndexStatus
 from app.indexing import index_repo
 
+from app.rag import answer_question
+
 router = APIRouter(prefix="/repos", tags=["repos"])
 
 CODE_EXTENSIONS = {
@@ -125,3 +127,12 @@ def trigger_indexing(
     index_repo(repo_id, db)
     db.refresh(repo)
     return {"id": repo.id, "index_status": repo.index_status}
+
+@router.post("/{repo_id}/ask")
+def ask_question(repo_id: int, question: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    repo = db.query(Repo).filter(Repo.id == repo_id, Repo.owner_id == user.id).first()
+    if repo is None:
+        raise HTTPException(status_code=404, detail="Repo not found")
+
+    result = answer_question(question, repo_id, db)
+    return result
