@@ -12,6 +12,8 @@ from app.indexing import index_repo
 from app.rag import answer_question
 from app.pr_review import fetch_pr_diff, review_pr
 
+from app.explain import explain_file, generate_docs
+
 router = APIRouter(prefix="/repos", tags=["repos"])
 
 CODE_EXTENSIONS = {
@@ -150,3 +152,24 @@ async def review_pull_request(repo_id:int, pr_number:int, user: User = Depends(g
 
     result = review_pr(diff, repo_id, db)
     return result
+
+@router.post("/{repo_id}/explain-file")
+def explain_repo_file(repo_id: int, file_path: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    repo = db.query(Repo).filter(Repo.id == repo_id, Repo.owner_id == user.id).first()
+    if repo is None:
+        raise HTTPException(status_code=404, detail="Repo not found")
+
+    try:
+        return explain_file(repo_id, file_path, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/{repo_id}/generate-docs")
+def generate_repo_docs(repo_id: int, file_path: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    repo = db.query(Repo).filter(Repo.id == repo_id, Repo.owner_id == user.id).first()
+    if repo is None:
+        raise HTTPException(status_code=404, detail="Repo not found")
+    try:
+        return generate_docs(repo_id, file_path, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
