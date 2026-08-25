@@ -27,7 +27,7 @@ async def fetch_pr_diff(full_name:str, pr_number:int, access_token:str) -> str:
         return response.text
 
 def review_pr(diff:str, repo_id:int, db) -> dict:
-    relevant_chunks = search_relevant_chunks(diff[:2000], repo_id, top_k=5)
+    relevant_chunks = search_relevant_chunks(diff[:2000], repo_id, db, top_k=5)
 
     context_parts=[]
     for item in relevant_chunks:
@@ -39,7 +39,7 @@ def review_pr(diff:str, repo_id:int, db) -> dict:
 
     user_message = f"Relevant codebase content:\n{context}\n\nPull Request diff:\n{diff}"
 
-    response = client.chat.conversations.create(
+    response = client.chat.completions.create(
         model = CHAT_MODEL,
         messages = [
             {"role": "system", "content": REVIEW_SYSTEM_PROMPT},
