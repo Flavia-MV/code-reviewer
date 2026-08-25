@@ -18,6 +18,9 @@ export default function Dashboard() {
     const [answer, setAnswer] = useState<{ answer: string; sources: any[] } | null>(null);
     const [askingRepoId, setAskingRepoId] = useState<number | null>(null);
     const [asking, setAsking] = useState(false);
+    const [prReview, setPrReview] = useState<string | null>(null);
+    const [prNumber, setPrNumber] = useState("");
+
 
     const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
 
@@ -79,6 +82,25 @@ export default function Dashboard() {
                 );
             const data = await res.json();
             setAnswer(data);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+        } finally {
+            setAsking(false);
+        }
+    }
+    async function reviewPR(repoId: number) {
+        setAsking(true);
+        setPrReview(null);
+        try {
+            const res = await fetch(
+                `${BACKEND_URL}/repos/${repoId}/review-pr?pr_number=${prNumber}`,
+                {
+                    method: "POST",
+                    headers: {Authorization: `Bearer ${token}`},
+                }
+            );
+            const data = await res.json();
+            setPrReview(data.review || data.detail);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Eroare necunoscuta");
         } finally {
@@ -153,6 +175,25 @@ export default function Dashboard() {
                               </div>
                           </div>
                       )}
+                      <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                          <div style={{display:"flex", gap: "0.5rem"}}>
+                              <input
+                                  value={prNumber}
+                                  onChange={(e) => setPrNumber(e.target.value)}
+                                  placeholder="Numar PR, ex: 1"
+                                  style={{width:"120px", padding: "0.5rem"}}
+                              />
+                              <button onClick={() => reviewPR(repo.id)} disabled={asking || !prNumber}>
+                                  Review PR
+                              </button>
+                          </div>
+                          {prReview && (
+                              <div style={{marginTop:"1rem", padding:"1rem", background:"#fff8e1", borderRadius:"8px",
+                                  whiteSpace:"pre-wrap"}}>
+                                  {prReview}
+                              </div>
+                          )}
+                      </div>
                   </div>
               )}
           </li>
