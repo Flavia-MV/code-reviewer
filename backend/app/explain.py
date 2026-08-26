@@ -13,7 +13,7 @@ its main exported functions and classes. Output only the documentation text, no 
 def explain_file(repo_id:int, file_path:str, db) -> dict:
     file = (
         db.query(RepoFile)
-        .filter(RepoFile.repo_id == repo_id, RepoFile.file_path == file_path)
+        .filter(RepoFile.repo_id == repo_id, RepoFile.path == file_path)
         .first()
     )
     if file is None:
@@ -22,7 +22,7 @@ def explain_file(repo_id:int, file_path:str, db) -> dict:
         model=CHAT_MODEL,
         messages=[
             {"role": "system", "content": EXPLAIN_SYSTEM_PROMPT},
-            {"'role": "user", "content": f"File: {file_path}\n\n{file.content}"},
+            {"role": "user", "content": f"File: {file_path}\n\n{file.content}"},
         ]
     )
     return {"explanation": response.choices[0].message.content}
@@ -30,7 +30,7 @@ def explain_file(repo_id:int, file_path:str, db) -> dict:
 def generate_docs(repo_id:int, file_path:str, db) -> dict:
     file = (
         db.query(RepoFile)
-        .filter(RepoFile.repo_id == repo_id, RepoFile.file_path == file_path)
+        .filter(RepoFile.repo_id == repo_id, RepoFile.path == file_path)
         .first()
     )
     if file is None:

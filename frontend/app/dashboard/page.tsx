@@ -20,7 +20,8 @@ export default function Dashboard() {
     const [asking, setAsking] = useState(false);
     const [prReview, setPrReview] = useState<string | null>(null);
     const [prNumber, setPrNumber] = useState("");
-
+    const [filePath, setFilePath] = useState("");
+    const [explanation, setExplanation] = useState<string | null>(null);
 
     const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
 
@@ -101,6 +102,26 @@ export default function Dashboard() {
             );
             const data = await res.json();
             setPrReview(data.review || data.detail);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+        } finally {
+            setAsking(false);
+        }
+    }
+    async function explainFile(repoId: number, mode: "explain" | "docs") {
+        setAsking(true);
+        setExplanation(null);
+        try {
+            const endpoint = mode == "explain" ? "explain-file" : "generate-docs";
+            const res = await fetch(
+                `${BACKEND_URL}/repos/${repoId}/${endpoint}?file_path=${encodeURIComponent(filePath)}`,
+                {
+                    method: "POST",
+                    headers: {Authorization: `Bearer ${token}`},
+                }
+            );
+            const data = await res.json();
+            setExplanation(data.explanation || data.documentation || data.detail);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Eroare necunoscuta");
         } finally {
@@ -194,7 +215,31 @@ export default function Dashboard() {
                               </div>
                           )}
                       </div>
+                        <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                  <div style={{display: "flex", gap: "0.5rem"}}>
+                      <input
+                          value={filePath}
+                          onChange={(e) => setFilePath(e.target.value)}
+                          placeholder="Cale fisier, ex: file1.py"
+                          style={{flex:1, padding: "0.5rem"}}
+                      />
+                      <button onClick={() => explainFile(repo.id, "explain")} disabled={asking || !filePath}>
+                          Explica
+                      </button>
+                      <button onClick={() => explainFile(repo.id, "docs")} disabled={asking || !filePath}>
+                          Genereaza docs
+                      </button>
                   </div>
+                  {explanation && (
+                      <div style={{marginTop: "1rem", padding: "1rem", background:"#e8f5e9", borderRadius:"8px", whiteSpace:"pre-wrap"}}>
+                          {explanation}
+                      </div>
+                  )}
+              </div>
+
+
+                  </div>
+
               )}
           </li>
         ))}
