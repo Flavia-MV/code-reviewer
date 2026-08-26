@@ -7,9 +7,15 @@ from app.auth import router as auth_router, get_current_user
 from app.repos import router as repos_router
 from app.models import User
 
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.limiter import limiter
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Code Reviewer API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
