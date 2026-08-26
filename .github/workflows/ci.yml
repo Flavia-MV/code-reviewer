@@ -15,7 +15,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTRGRES_DB: ai_dev_platform
+          POSTGRES_DB: ai_dev_platform
         ports:
           - 5432:5432
         options: >-
