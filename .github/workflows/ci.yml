@@ -9,21 +9,21 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Install dependencies
-      working directory: backend
-      run: pip install -r requirements.txt
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
 
-    - name: Check imports
-      working-directory: backend
-      run: python -c "import app.main"
+      - name: Check imports
+        working-directory: backend
+        run: python -c "import app.main"
 
   frontend:
     runs-on: ubuntu-latest
