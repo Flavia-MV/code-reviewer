@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect} from "react";
+import { Suspense, useEffect} from "react";
 import { useRouter, useSearchParams} from "next/navigation";
 
-export default function AuthCallback() {
+function CallbackHandler() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -16,5 +16,13 @@ export default function AuthCallback() {
             router.replace("/");
         }
     }, [searchParams, router]);
-    return <p style={{ textAlign: "center", marginTop: "4rem" }}>Se conecteaza...</p>;
+    return <p style={{textAlign: "center", marginTop: "4rem"}}>Se conecteaza...</p>
+}
+
+export default function AuthCallback() {
+    return (
+        <Suspense fallback={<p style={{textAlign: "center", marginTop:"4rem"}}>Se incarca...</p>}>
+            <CallbackHandler />
+        </Suspense>
+    )
 }
