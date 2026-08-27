@@ -2,6 +2,7 @@
 
 An AI assistant for exploring codebases. Connect a GitHub repo, ask questions about the code, get PR reviews and
 auto-generate docs - all grounded in the actual source code through RAG, not just LLM knowledge.
+**Live demo**: https://code-reviewer-zeta-ruby.vercel.app
 
 ## What it does
 
