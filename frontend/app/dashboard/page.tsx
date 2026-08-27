@@ -45,12 +45,12 @@ export default function Dashboard() {
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "Import esuat");
+        throw new Error(data.detail || "Import failed");
       }
       setRepoInput("");
       await fetchRepos();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+      setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function Dashboard() {
             });
             await fetchRepos();
         } catch (e) {
-            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+            setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
             setLoading(false);
         }
@@ -84,7 +84,7 @@ export default function Dashboard() {
             const data = await res.json();
             setAnswer(data);
         } catch (e) {
-            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+            setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
             setAsking(false);
         }
@@ -103,7 +103,7 @@ export default function Dashboard() {
             const data = await res.json();
             setPrReview(data.review || data.detail);
         } catch (e) {
-            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+            setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
             setAsking(false);
         }
@@ -123,7 +123,7 @@ export default function Dashboard() {
             const data = await res.json();
             setExplanation(data.explanation || data.documentation || data.detail);
         } catch (e) {
-            setError(e instanceof Error ? e.message : "Eroare necunoscuta");
+            setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
             setAsking(false);
         }
@@ -131,17 +131,17 @@ export default function Dashboard() {
 
   return (
     <main style={{ maxWidth: "600px", margin: "3rem auto", fontFamily: "sans-serif" }}>
-      <h1>Repo-urile tale</h1>
+      <h1>Your repositories</h1>
 
       <div style={{ display: "flex", gap: "0.5rem", margin: "1.5rem 0" }}>
         <input
           value={repoInput}
           onChange={(e) => setRepoInput(e.target.value)}
-          placeholder="owner/repo, ex: octocat/hello-world"
+          placeholder="owner/repo, e.g. octocat/hello-world"
           style={{ flex: 1, padding: "0.5rem" }}
         />
         <button onClick={importRepo} disabled={loading || !repoInput}>
-          {loading ? "Se importa..." : "Importa"}
+          {loading ? "Importing..." : "Import"}
         </button>
       </div>
 
@@ -157,11 +157,11 @@ export default function Dashboard() {
                 </span>
                   <div style={{display: "flex", gap: "0.5rem"}}>
                      <button onClick={() => indexRepo(repo.id)} disabled={loading}>
-                         Indexeaza
+                         Index
                      </button>
                       {repo.index_status === "ready" && (
                           <button onClick={() => setAskingRepoId(askingRepoId === repo.id ? null : repo.id)}>
-                           Intreaba
+                           Ask
                           </button>
                       )}
                   </div>
@@ -173,22 +173,22 @@ export default function Dashboard() {
                           <input
                               value={question}
                               onChange={(e) => setQuestion(e.target.value)}
-                              placeholder="Ce vrei sa stii despre acest cod?"
+                              placeholder="What do you want to know about this code?"
                               style={{flex:1, padding: "0.5rem"}}
                               />
                           <button onClick={() => askQuestion(repo.id)} disabled={asking || !question}>
-                              {asking ? "Se gandeste..." : "Trimite"}
+                              {asking ? "Thinking..." : "Send"}
                           </button>
                       </div>
                       {answer && (
                           <div style ={{marginTop: "1rem", paddingTop: "1rem", background: "#f7f7f7", borderRadius: "8px"}}>
                               <p>{answer.answer}</p>
                               <div style = {{marginTop: "0.5rem", fontSize: "0.85rem", color: "#666"}}>
-                                  <strong>Surse:</strong>
+                                  <strong>Sources:</strong>
                                   <ul>
                                       {answer.sources.map((source, i) => (
                                           <li key={i}>
-                                              {source.file_path} (linii {source.start_line}-{source.end_line})
+                                              {source.file_path} (lines {source.start_line}-{source.end_line})
                                               {source.name && ` - ${source.name}`}
                                           </li>
                                           ))}
@@ -201,7 +201,7 @@ export default function Dashboard() {
                               <input
                                   value={prNumber}
                                   onChange={(e) => setPrNumber(e.target.value)}
-                                  placeholder="Numar PR, ex: 1"
+                                  placeholder="PR number, e.g. 1"
                                   style={{width:"120px", padding: "0.5rem"}}
                               />
                               <button onClick={() => reviewPR(repo.id)} disabled={asking || !prNumber}>
@@ -220,14 +220,14 @@ export default function Dashboard() {
                       <input
                           value={filePath}
                           onChange={(e) => setFilePath(e.target.value)}
-                          placeholder="Cale fisier, ex: file1.py"
+                          placeholder="File path, e.g. file1.py"
                           style={{flex:1, padding: "0.5rem"}}
                       />
                       <button onClick={() => explainFile(repo.id, "explain")} disabled={asking || !filePath}>
-                          Explica
+                          Explain
                       </button>
                       <button onClick={() => explainFile(repo.id, "docs")} disabled={asking || !filePath}>
-                          Genereaza docs
+                          Generate docs
                       </button>
                   </div>
                   {explanation && (

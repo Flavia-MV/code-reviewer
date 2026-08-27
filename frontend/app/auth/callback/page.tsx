@@ -16,12 +16,12 @@ function CallbackHandler() {
             router.replace("/");
         }
     }, [searchParams, router]);
-    return <p style={{textAlign: "center", marginTop: "4rem"}}>Se conecteaza...</p>
+    return <p style={{textAlign: "center", marginTop: "4rem"}}>Connecting...</p>
 }
 
 export default function AuthCallback() {
     return (
-        <Suspense fallback={<p style={{textAlign: "center", marginTop:"4rem"}}>Se incarca...</p>}>
+        <Suspense fallback={<p style={{textAlign: "center", marginTop:"4rem"}}>Loading...</p>}>
             <CallbackHandler />
         </Suspense>
     )
