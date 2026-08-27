@@ -1,0 +1,65 @@
+:root {
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-text: #1a1a1a;
+    --color-text-muted: #6b7280;
+    --color-bg-section: #f9fafb;
+    --color-border: #e5e7eb;
+    --color-success: #16a34a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--color-text);
+    background: #ffffff;
+}
+
+button {
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    background: var(--color-primary);
+    color: white;
+    transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
+button:disabled {
+    background: var(--color-border);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+input {
+    font-family: inherit;
+    font-size: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.6rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.card {
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}

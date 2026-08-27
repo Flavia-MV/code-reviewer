@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState} from "react";
+import ReactMarkdown from "react-markdown";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -130,7 +131,7 @@ export default function Dashboard() {
     }
 
   return (
-    <main style={{ maxWidth: "600px", margin: "3rem auto", fontFamily: "sans-serif" }}>
+    <main style={{ maxWidth: "600px", margin: "3rem auto", fontFamily: "sans-serif", padding: "0 1rem"}}>
       <h1>Your repositories</h1>
 
       <div style={{ display: "flex", gap: "0.5rem", margin: "1.5rem 0" }}>
@@ -145,15 +146,15 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "#dc2626"}}>{error}</p>}
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         {repos.map((repo) => (
-          <li key={repo.id} style={{ padding: "0.75rem", border: "1px solid #eee", borderRadius: "8px", marginBottom: "0.5rem" }}>
+          <li key={repo.id} className="card" style={{ marginBottom: "0.5rem" }}>
               <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                 <span>
                     <strong>{repo.full_name}</strong>
-                    <span style={{ marginLeft: "0.5rem", color: "#666" }}>({repo.index_status})</span>
+                    <span className="text-muted" style={{ marginLeft: "0.5rem"}}>({repo.index_status})</span>
                 </span>
                   <div style={{display: "flex", gap: "0.5rem"}}>
                      <button onClick={() => indexRepo(repo.id)} disabled={loading}>
@@ -168,22 +169,22 @@ export default function Dashboard() {
               </div>
 
               {askingRepoId === repo.id && (
-                  <div style = {{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                  <div style = {{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--color-border)"}}>
                       <div style={{display: "flex", gap: "0.5rem"}}>
                           <input
                               value={question}
                               onChange={(e) => setQuestion(e.target.value)}
                               placeholder="What do you want to know about this code?"
-                              style={{flex:1, padding: "0.5rem"}}
+                              style={{flex:1}}
                               />
                           <button onClick={() => askQuestion(repo.id)} disabled={asking || !question}>
                               {asking ? "Thinking..." : "Send"}
                           </button>
                       </div>
                       {answer && (
-                          <div style ={{marginTop: "1rem", paddingTop: "1rem", background: "#f7f7f7", borderRadius: "8px"}}>
-                              <p>{answer.answer}</p>
-                              <div style = {{marginTop: "0.5rem", fontSize: "0.85rem", color: "#666"}}>
+                          <div className="section-box" style ={{marginTop: "1rem"}}>
+                              <ReactMarkdown>{answer.answer}</ReactMarkdown>
+                              <div className="text-muted" style = {{marginTop: "0.5rem"}}>
                                   <strong>Sources:</strong>
                                   <ul>
                                       {answer.sources.map((source, i) => (
@@ -196,32 +197,31 @@ export default function Dashboard() {
                               </div>
                           </div>
                       )}
-                      <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                      <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--color-border)"}}>
                           <div style={{display:"flex", gap: "0.5rem"}}>
                               <input
                                   value={prNumber}
                                   onChange={(e) => setPrNumber(e.target.value)}
                                   placeholder="PR number, e.g. 1"
-                                  style={{width:"120px", padding: "0.5rem"}}
+                                  style={{width:"120px"}}
                               />
                               <button onClick={() => reviewPR(repo.id)} disabled={asking || !prNumber}>
                                   Review PR
                               </button>
                           </div>
                           {prReview && (
-                              <div style={{marginTop:"1rem", padding:"1rem", background:"#fff8e1", borderRadius:"8px",
-                                  whiteSpace:"pre-wrap"}}>
-                                  {prReview}
+                              <div className="section-box" style={{marginTop:"1rem"}}>
+                                  <ReactMarkdown>{prReview}</ReactMarkdown>
                               </div>
                           )}
                       </div>
-                        <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #eee"}}>
+                        <div style={{marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--color-border)"}}>
                   <div style={{display: "flex", gap: "0.5rem"}}>
                       <input
                           value={filePath}
                           onChange={(e) => setFilePath(e.target.value)}
                           placeholder="File path, e.g. file1.py"
-                          style={{flex:1, padding: "0.5rem"}}
+                          style={{flex:1}}
                       />
                       <button onClick={() => explainFile(repo.id, "explain")} disabled={asking || !filePath}>
                           Explain
@@ -231,8 +231,8 @@ export default function Dashboard() {
                       </button>
                   </div>
                   {explanation && (
-                      <div style={{marginTop: "1rem", padding: "1rem", background:"#e8f5e9", borderRadius:"8px", whiteSpace:"pre-wrap"}}>
-                          {explanation}
+                      <div className="section-box" style={{marginTop: "1rem"}}>
+                          <ReactMarkdown>{explanation}</ReactMarkdown>
                       </div>
                   )}
               </div>
